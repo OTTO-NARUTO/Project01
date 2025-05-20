@@ -1,0 +1,18 @@
+import './App.css';
+import Loginpage from './pages/Loginpage';
+import Registerpage from './pages/Registerpage';
+import {BrowserRouter as Router,Routes,Route}from 'react-router-dom';
+
+  function App(){
+    return (
+      <Router>
+        <Routes>
+          <Route path = "/login" element ={<Loginpage/>} />
+          <Route path = "/register" element ={<Registerpage/>} />
+        </Routes>
+      </Router>
+    )
+  }
+
+
+export default App;

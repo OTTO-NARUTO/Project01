@@ -1,33 +1,49 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import '../styles/AuthPage.css';
+
 function Loginpage() {
-  const [email, setEmail] = useState(''); // email is the current value and setemail is for the update it 
-  const [password,setpassword] = useState('');
-  const handlesubmit  = (e) => {  
-    e.preventDefault();    // stop page reload 
-    console.log ('Email:',email); // print  the email
-    console.log('Password:',password); // print the password
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:5000/api/users/login', { email, password });
+      localStorage.setItem('user', JSON.stringify(response.data));
+      navigate('/dashboard/userprofile');
+    } catch (err) {
+      alert('Invalid credentials.');
+    }
   };
-  return(       // render the login from ui 
-    <div>
-      <h2>login</h2>
-      <form onSubmit ={handlesubmit}>
+
+  return (
+    <div className="form-container">
+      <form className="form" onSubmit={handleLogin}>
+        <h2 className="title">🔐 Login</h2>
         <input
-         type = "email"
-         placeholder='email'
-         value={email}
-         onChange = {(e) => setEmail(e.target.value)}
-         />
-         <br/><br/>
-         <input
-         type = "password"
-         placeholder='passsword'
-         value={password}
-         onC hange = {(e) => setpassword(e.target.value)}
-         />
-         <br/><br/>
-         <button type = "submit">login</button>    
+          type="email"
+          placeholder="Email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button className="submit-btn" type="submit">Login</button>
+        <p className="bottom-link">
+          Don’t have an account? <a href="/register">Signup</a>
+        </p>
       </form>
     </div>
   );
 }
+
 export default Loginpage;

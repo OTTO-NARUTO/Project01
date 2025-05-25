@@ -1,0 +1,1140 @@
+{
+  "D:\\Personal\\Project's\\Project01\\backend\\serverless.yml": {
+    "versionFramework": "4.14.4",
+    "servicePath": "D:\\Personal\\Project's\\Project01\\backend\\serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "user-crud-api",
+      "provider": {
+        "name": "aws",
+        "runtime": "python3.9",
+        "region": "eu-north-1",
+        "timeout": 30,
+        "stage": "dev",
+        "versionFunctions": true,
+        "compiledCloudFormationTemplate": {
+          "AWSTemplateFormatVersion": "2010-09-09",
+          "Description": "The AWS CloudFormation template for this Serverless application",
+          "Resources": {
+            "AppLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/user-crud-api-dev-app"
+              }
+            },
+            "IamRoleLambdaExecution": {
+              "Type": "AWS::IAM::Role",
+              "Properties": {
+                "AssumeRolePolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Principal": {
+                        "Service": [
+                          "lambda.amazonaws.com"
+                        ]
+                      },
+                      "Action": [
+                        "sts:AssumeRole"
+                      ]
+                    }
+                  ]
+                },
+                "Policies": [
+                  {
+                    "PolicyName": {
+                      "Fn::Join": [
+                        "-",
+                        [
+                          "user-crud-api",
+                          "dev",
+                          "lambda"
+                        ]
+                      ]
+                    },
+                    "PolicyDocument": {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "logs:CreateLogStream",
+                            "logs:CreateLogGroup",
+                            "logs:TagResource"
+                          ],
+                          "Resource": [
+                            {
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/user-crud-api-dev*:*"
+                            }
+                          ]
+                        },
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "logs:PutLogEvents"
+                          ],
+                          "Resource": [
+                            {
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/user-crud-api-dev*:*:*"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "Path": "/",
+                "RoleName": {
+                  "Fn::Join": [
+                    "-",
+                    [
+                      "user-crud-api",
+                      "dev",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "lambdaRole"
+                    ]
+                  ]
+                }
+              }
+            },
+            "AppLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-eu-north-1-1ddd2adc-34bd",
+                  "S3Key": "serverless/user-crud-api/dev/1748209769378-2025-05-25T21:49:29.378Z/app.zip"
+                },
+                "Handler": "wsgi_handler.handler",
+                "Runtime": "python3.9",
+                "FunctionName": "user-crud-api-dev-app",
+                "MemorySize": 1024,
+                "Timeout": 30,
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                }
+              },
+              "DependsOn": [
+                "AppLogGroup"
+              ]
+            },
+            "AppLambdaVersionkj09i0kwiu0r1Rp4Gpul2R7XlFLWRj7zcIfdj7jAEU": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "AppLambdaFunction"
+                },
+                "CodeSha256": "ASz5fZZk4gprDmSGlXom0Njl3Amz+1R8iAcyxv2btVs="
+              }
+            },
+            "ApiGatewayRestApi": {
+              "Type": "AWS::ApiGateway::RestApi",
+              "Properties": {
+                "Name": "dev-user-crud-api",
+                "EndpointConfiguration": {
+                  "Types": [
+                    "EDGE"
+                  ]
+                },
+                "Policy": ""
+              }
+            },
+            "ApiGatewayResourceProxyVar": {
+              "Type": "AWS::ApiGateway::Resource",
+              "Properties": {
+                "ParentId": {
+                  "Fn::GetAtt": [
+                    "ApiGatewayRestApi",
+                    "RootResourceId"
+                  ]
+                },
+                "PathPart": "{proxy+}",
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                }
+              }
+            },
+            "ApiGatewayMethodAny": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "HttpMethod": "ANY",
+                "RequestParameters": {},
+                "ResourceId": {
+                  "Fn::GetAtt": [
+                    "ApiGatewayRestApi",
+                    "RootResourceId"
+                  ]
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "ApiKeyRequired": "<REDACTED>",
+                "AuthorizationType": "NONE",
+                "Integration": {
+                  "IntegrationHttpMethod": "POST",
+                  "Type": "AWS_PROXY",
+                  "Uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+                        {
+                          "Fn::GetAtt": [
+                            "AppLambdaFunction",
+                            "Arn"
+                          ]
+                        },
+                        "/invocations"
+                      ]
+                    ]
+                  }
+                },
+                "MethodResponses": []
+              },
+              "DependsOn": [
+                "AppLambdaPermissionApiGateway"
+              ]
+            },
+            "ApiGatewayMethodProxyVarAny": {
+              "Type": "AWS::ApiGateway::Method",
+              "Properties": {
+                "HttpMethod": "ANY",
+                "RequestParameters": {},
+                "ResourceId": {
+                  "Ref": "ApiGatewayResourceProxyVar"
+                },
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "ApiKeyRequired": "<REDACTED>",
+                "AuthorizationType": "NONE",
+                "Integration": {
+                  "IntegrationHttpMethod": "POST",
+                  "Type": "AWS_PROXY",
+                  "Uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:",
+                        {
+                          "Ref": "AWS::Partition"
+                        },
+                        ":apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+                        {
+                          "Fn::GetAtt": [
+                            "AppLambdaFunction",
+                            "Arn"
+                          ]
+                        },
+                        "/invocations"
+                      ]
+                    ]
+                  }
+                },
+                "MethodResponses": []
+              },
+              "DependsOn": [
+                "AppLambdaPermissionApiGateway"
+              ]
+            },
+            "ApiGatewayDeployment1748209735459": {
+              "Type": "AWS::ApiGateway::Deployment",
+              "Properties": {
+                "RestApiId": {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                "StageName": "dev"
+              },
+              "DependsOn": [
+                "ApiGatewayMethodAny",
+                "ApiGatewayMethodProxyVarAny"
+              ]
+            },
+            "AppLambdaPermissionApiGateway": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "AppLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "ApiGatewayRestApi"
+                      },
+                      "/*/*"
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "Outputs": {
+            "ServerlessDeploymentBucketName": {
+              "Value": "serverless-framework-deployments-eu-north-1-1ddd2adc-34bd",
+              "Export": {
+                "Name": "sls-user-crud-api-dev-ServerlessDeploymentBucketName"
+              }
+            },
+            "AppLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "AppLambdaVersionkj09i0kwiu0r1Rp4Gpul2R7XlFLWRj7zcIfdj7jAEU"
+              },
+              "Export": {
+                "Name": "sls-user-crud-api-dev-AppLambdaFunctionQualifiedArn"
+              }
+            },
+            "ServiceEndpoint": {
+              "Description": "URL of the service endpoint",
+              "Value": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "https://",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    ".execute-api.",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ".",
+                    {
+                      "Ref": "AWS::URLSuffix"
+                    },
+                    "/dev"
+                  ]
+                ]
+              },
+              "Export": {
+                "Name": "sls-user-crud-api-dev-ServiceEndpoint"
+              }
+            }
+          }
+        },
+        "vpc": {}
+      },
+      "plugins": [
+        "serverless-wsgi",
+        "serverless-python-requirements"
+      ],
+      "custom": {
+        "wsgi": {
+          "app": "app.app",
+          "packRequirements": false
+        },
+        "pythonRequirements": {
+          "dockerizePip": true
+        }
+      },
+      "package": {
+        "individually": true,
+        "include": [
+          "app.py",
+          "config/**",
+          "controllers/**",
+          "models/**",
+          "routes/**",
+          ".env"
+        ],
+        "artifactsS3KeyDirname": "serverless/user-crud-api/dev/code-artifacts",
+        "deploymentBucket": "serverless-framework-deployments-eu-north-1-1ddd2adc-34bd",
+        "patterns": [
+          "wsgi_handler.py",
+          "serverless_wsgi.py",
+          ".serverless-wsgi"
+        ],
+        "artifactDirectoryName": "serverless/user-crud-api/dev/1748209769378-2025-05-25T21:49:29.378Z"
+      },
+      "functions": {
+        "app": {
+          "handler": "wsgi_handler.handler",
+          "events": [
+            {
+              "http": "ANY /"
+            },
+            {
+              "http": "ANY {proxy+}"
+            }
+          ],
+          "name": "user-crud-api-dev-app",
+          "module": ".",
+          "package": {
+            "artifact": ".serverless\\app.zip"
+          },
+          "memory": 1024,
+          "timeout": 30,
+          "runtime": "python3.9",
+          "vpc": {},
+          "versionLogicalId": "AppLambdaVersionkj09i0kwiu0r1Rp4Gpul2R7XlFLWRj7zcIfdj7jAEU"
+        }
+      }
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "python3.9",
+      "region": "eu-north-1",
+      "timeout": 30,
+      "stage": "dev",
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "AppLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/user-crud-api-dev-app"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "user-crud-api",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup",
+                          "logs:TagResource"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/user-crud-api-dev*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/user-crud-api-dev*:*:*"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "user-crud-api",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "AppLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-eu-north-1-1ddd2adc-34bd",
+                "S3Key": "serverless/user-crud-api/dev/1748209769378-2025-05-25T21:49:29.378Z/app.zip"
+              },
+              "Handler": "wsgi_handler.handler",
+              "Runtime": "python3.9",
+              "FunctionName": "user-crud-api-dev-app",
+              "MemorySize": 1024,
+              "Timeout": 30,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "AppLogGroup"
+            ]
+          },
+          "AppLambdaVersionkj09i0kwiu0r1Rp4Gpul2R7XlFLWRj7zcIfdj7jAEU": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "AppLambdaFunction"
+              },
+              "CodeSha256": "ASz5fZZk4gprDmSGlXom0Njl3Amz+1R8iAcyxv2btVs="
+            }
+          },
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+              "Name": "dev-user-crud-api",
+              "EndpointConfiguration": {
+                "Types": [
+                  "EDGE"
+                ]
+              },
+              "Policy": ""
+            }
+          },
+          "ApiGatewayResourceProxyVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "{proxy+}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodAny": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "ANY",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": "<REDACTED>",
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "AppLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "AppLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayMethodProxyVarAny": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "ANY",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceProxyVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": "<REDACTED>",
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "AppLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "AppLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayDeployment1748209735459": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "dev"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodAny",
+              "ApiGatewayMethodProxyVarAny"
+            ]
+          },
+          "AppLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "AppLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "serverless-framework-deployments-eu-north-1-1ddd2adc-34bd",
+            "Export": {
+              "Name": "sls-user-crud-api-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "AppLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "AppLambdaVersionkj09i0kwiu0r1Rp4Gpul2R7XlFLWRj7zcIfdj7jAEU"
+            },
+            "Export": {
+              "Name": "sls-user-crud-api-dev-AppLambdaFunctionQualifiedArn"
+            }
+          },
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/dev"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-user-crud-api-dev-ServiceEndpoint"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "serviceRawFile": "service: user-crud-api\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: python3.9\r\n  region: eu-north-1\r\n  timeout: 30\r\n\r\nplugins:\r\n  - serverless-wsgi\r\n  - serverless-python-requirements\r\n\r\ncustom:\r\n  wsgi:\r\n    app: app.app\r\n    packRequirements: false\r\n  pythonRequirements:\r\n    dockerizePip: true\r\n\r\npackage:\r\n  individually: true\r\n  include:\r\n    - app.py\r\n    - config/**\r\n    - controllers/**\r\n    - models/**\r\n    - routes/**\r\n    - .env\r\n\r\nfunctions:\r\n  app:\r\n    handler: wsgi_handler.handler\r\n    events:\r\n      - http: ANY /\r\n      - http: 'ANY {proxy+}'\r\n",
+    "command": [
+      "deploy"
+    ],
+    "options": {},
+    "orgId": "1e5fb869-8422-43cf-b711-107f364781bf",
+    "orgName": "nightsleeper",
+    "userId": "PmqPdSWTPdk45Tzk1M",
+    "userName": "nightsleeper",
+    "serviceProviderAwsAccountId": "105340476390",
+    "serviceProviderAwsCfStackName": "user-crud-api-dev",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:eu-north-1:105340476390:stack/user-crud-api-dev/e3b7f190-39a7-11f0-8aa2-06716717aea5",
+    "serviceProviderAwsCfStackCreated": "2025-05-25T20:36:09.575Z",
+    "serviceProviderAwsCfStackUpdated": "2025-05-25T21:42:09.251Z",
+    "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "AppLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:eu-north-1:105340476390:function:user-crud-api-dev-app:7",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-user-crud-api-dev-AppLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "ServiceEndpoint",
+        "OutputValue": "https://iokqjv7usl.execute-api.eu-north-1.amazonaws.com/dev",
+        "Description": "URL of the service endpoint",
+        "ExportName": "sls-user-crud-api-dev-ServiceEndpoint"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "serverless-framework-deployments-eu-north-1-1ddd2adc-34bd",
+        "ExportName": "sls-user-crud-api-dev-ServerlessDeploymentBucketName"
+      }
+    ],
+    "compiledCloudFormationTemplate": {
+      "AWSTemplateFormatVersion": "2010-09-09",
+      "Description": "The AWS CloudFormation template for this Serverless application",
+      "Resources": {
+        "AppLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/user-crud-api-dev-app"
+          }
+        },
+        "IamRoleLambdaExecution": {
+          "Type": "AWS::IAM::Role",
+          "Properties": {
+            "AssumeRolePolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": [
+                      "lambda.amazonaws.com"
+                    ]
+                  },
+                  "Action": [
+                    "sts:AssumeRole"
+                  ]
+                }
+              ]
+            },
+            "Policies": [
+              {
+                "PolicyName": {
+                  "Fn::Join": [
+                    "-",
+                    [
+                      "user-crud-api",
+                      "dev",
+                      "lambda"
+                    ]
+                  ]
+                },
+                "PolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "logs:CreateLogStream",
+                        "logs:CreateLogGroup",
+                        "logs:TagResource"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/user-crud-api-dev*:*"
+                        }
+                      ]
+                    },
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "logs:PutLogEvents"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/user-crud-api-dev*:*:*"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "Path": "/",
+            "RoleName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "user-crud-api",
+                  "dev",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "lambdaRole"
+                ]
+              ]
+            }
+          }
+        },
+        "AppLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-eu-north-1-1ddd2adc-34bd",
+              "S3Key": "serverless/user-crud-api/dev/1748209769378-2025-05-25T21:49:29.378Z/app.zip"
+            },
+            "Handler": "wsgi_handler.handler",
+            "Runtime": "python3.9",
+            "FunctionName": "user-crud-api-dev-app",
+            "MemorySize": 1024,
+            "Timeout": 30,
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            }
+          },
+          "DependsOn": [
+            "AppLogGroup"
+          ]
+        },
+        "AppLambdaVersionkj09i0kwiu0r1Rp4Gpul2R7XlFLWRj7zcIfdj7jAEU": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "AppLambdaFunction"
+            },
+            "CodeSha256": "ASz5fZZk4gprDmSGlXom0Njl3Amz+1R8iAcyxv2btVs="
+          }
+        },
+        "ApiGatewayRestApi": {
+          "Type": "AWS::ApiGateway::RestApi",
+          "Properties": {
+            "Name": "dev-user-crud-api",
+            "EndpointConfiguration": {
+              "Types": [
+                "EDGE"
+              ]
+            },
+            "Policy": ""
+          }
+        },
+        "ApiGatewayResourceProxyVar": {
+          "Type": "AWS::ApiGateway::Resource",
+          "Properties": {
+            "ParentId": {
+              "Fn::GetAtt": [
+                "ApiGatewayRestApi",
+                "RootResourceId"
+              ]
+            },
+            "PathPart": "{proxy+}",
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            }
+          }
+        },
+        "ApiGatewayMethodAny": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "HttpMethod": "ANY",
+            "RequestParameters": {},
+            "ResourceId": {
+              "Fn::GetAtt": [
+                "ApiGatewayRestApi",
+                "RootResourceId"
+              ]
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "ApiKeyRequired": "<REDACTED>",
+            "AuthorizationType": "NONE",
+            "Integration": {
+              "IntegrationHttpMethod": "POST",
+              "Type": "AWS_PROXY",
+              "Uri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "AppLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            },
+            "MethodResponses": []
+          },
+          "DependsOn": [
+            "AppLambdaPermissionApiGateway"
+          ]
+        },
+        "ApiGatewayMethodProxyVarAny": {
+          "Type": "AWS::ApiGateway::Method",
+          "Properties": {
+            "HttpMethod": "ANY",
+            "RequestParameters": {},
+            "ResourceId": {
+              "Ref": "ApiGatewayResourceProxyVar"
+            },
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "ApiKeyRequired": "<REDACTED>",
+            "AuthorizationType": "NONE",
+            "Integration": {
+              "IntegrationHttpMethod": "POST",
+              "Type": "AWS_PROXY",
+              "Uri": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":apigateway:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":lambda:path/2015-03-31/functions/",
+                    {
+                      "Fn::GetAtt": [
+                        "AppLambdaFunction",
+                        "Arn"
+                      ]
+                    },
+                    "/invocations"
+                  ]
+                ]
+              }
+            },
+            "MethodResponses": []
+          },
+          "DependsOn": [
+            "AppLambdaPermissionApiGateway"
+          ]
+        },
+        "ApiGatewayDeployment1748209735459": {
+          "Type": "AWS::ApiGateway::Deployment",
+          "Properties": {
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "StageName": "dev"
+          },
+          "DependsOn": [
+            "ApiGatewayMethodAny",
+            "ApiGatewayMethodProxyVarAny"
+          ]
+        },
+        "AppLambdaPermissionApiGateway": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "AppLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  "/*/*"
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "Outputs": {
+        "ServerlessDeploymentBucketName": {
+          "Value": "serverless-framework-deployments-eu-north-1-1ddd2adc-34bd",
+          "Export": {
+            "Name": "sls-user-crud-api-dev-ServerlessDeploymentBucketName"
+          }
+        },
+        "AppLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "AppLambdaVersionkj09i0kwiu0r1Rp4Gpul2R7XlFLWRj7zcIfdj7jAEU"
+          },
+          "Export": {
+            "Name": "sls-user-crud-api-dev-AppLambdaFunctionQualifiedArn"
+          }
+        },
+        "ServiceEndpoint": {
+          "Description": "URL of the service endpoint",
+          "Value": {
+            "Fn::Join": [
+              "",
+              [
+                "https://",
+                {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                ".execute-api.",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ".",
+                {
+                  "Ref": "AWS::URLSuffix"
+                },
+                "/dev"
+              ]
+            ]
+          },
+          "Export": {
+            "Name": "sls-user-crud-api-dev-ServiceEndpoint"
+          }
+        }
+      }
+    }
+  }
+}

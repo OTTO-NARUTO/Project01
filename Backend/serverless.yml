@@ -1,0 +1,35 @@
+service: user-crud-api
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: eu-north-1
+  timeout: 30
+
+plugins:
+  - serverless-wsgi
+  - serverless-python-requirements
+
+custom:
+  wsgi:
+    app: app.app
+    packRequirements: false
+  pythonRequirements:
+    dockerizePip: true
+
+package:
+  individually: true
+  include:
+    - app.py
+    - config/**
+    - controllers/**
+    - models/**
+    - routes/**
+    - .env
+
+functions:
+  app:
+    handler: wsgi_handler.handler
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'

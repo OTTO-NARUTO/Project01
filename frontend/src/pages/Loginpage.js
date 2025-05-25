@@ -12,7 +12,8 @@ function Loginpage() {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/api/users/login', { email, password });
-      localStorage.setItem('user', JSON.stringify(response.data));
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+
       navigate('/dashboard/userprofile');
     } catch (err) {
       alert('Invalid credentials.');

@@ -13,11 +13,9 @@ const UserProfile = () => {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-
     if (storedUser) {
       try {
         const parsed = JSON.parse(storedUser);
-        // Account for either direct user object or nested under `.user`
         const userData = parsed.user || parsed;
 
         setUser({
@@ -27,16 +25,16 @@ const UserProfile = () => {
           id: userData.id || 'N/A',
         });
       } catch (err) {
-        console.error("Error parsing user data from localStorage:", err);
+        console.error("❌ Error parsing user data from localStorage:", err);
         localStorage.removeItem("user");
       }
     }
   }, []);
 
-  const handleEdit = async () => {
-    alert("Edit clicked! (Functionality coming soon)");
-    // Example patch:
-    // await axios.put(`http://localhost:5000/api/users/${user.id}`, { firstName: 'UpdatedName' });
+  const handleEdit = () => {
+    alert("🛠 Edit feature coming soon!");
+    // Example future implementation:
+    // await axios.put(`http://localhost:5000/api/users/${user.id}`, { firstName: 'NewName' });
   };
 
   const handleDelete = async () => {
@@ -44,11 +42,11 @@ const UserProfile = () => {
       try {
         await axios.delete(`http://localhost:5000/api/users/${user.id}`);
         localStorage.removeItem("user");
-        alert("User deleted.");
+        alert("✅ User deleted.");
         window.location.href = "/register";
       } catch (err) {
-        console.error("Delete failed:", err);
-        alert("Failed to delete user.");
+        console.error("❌ Delete failed:", err);
+        alert("Failed to delete user. Try again.");
       }
     }
   };
@@ -59,11 +57,12 @@ const UserProfile = () => {
       <div className="card">
         <div className="card__img">
           <img
-            src={"https://i.ibb.co/4pDNDk1/avatar.png"}
+            src="https://i.ibb.co/4pDNDk1/avatar.png"
             alt="avatar"
             className="avatar"
           />
         </div>
+
         <div className="card__body">
           <h2>{user.firstName} {user.lastName}</h2>
           <p><strong>First Name:</strong> {user.firstName}</p>

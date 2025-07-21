@@ -1,6 +1,6 @@
 from app import app
 from config.db import db
-from models.user_model import User
+from models.user_model import User,PlanSelection
 
 # Create tables inside the connected MySQL database
 with app.app_context():

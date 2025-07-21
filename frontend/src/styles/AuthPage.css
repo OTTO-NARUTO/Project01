@@ -1,70 +1,102 @@
-.form-container {
-  min-height: 100vh;
-  background: #f2f2f2;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #1d2671, #c33764);
+}
+
+/* Centering the card */
+.auth-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100vh;
 }
 
-.form {
-  background-color: #fff;
-  padding: 40px;
-  border-radius: 20px;
-  max-width: 500px;         /* Increased width */
-  width: 100%;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.name-fields {
-  display: flex;
-  gap: 15px;
-}
-
-.name-fields input {
-  flex: 1;
-}
-
-input {
-  padding: 14px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  outline: none;
-  width: 100%;
-}
-
-input:focus {
-  border-color: royalblue;
-  box-shadow: 0 0 0 2px rgba(65, 105, 225, 0.2);
-}
-
-.title {
-  font-size: 26px;
-  font-weight: 600;
-  color: royalblue;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.submit-btn {
-  background-color: royalblue;
+/* Card UI */
+.auth-card {
+  background-color: #2a2a2a;
+  padding: 40px 30px;
+  border-radius: 10px;
   color: white;
-  padding: 14px;
-  font-size: 16px;
+  text-align: center;
+  width: 100%;
+  max-width: 400px; /* Limit width on large screens */
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Title styling */
+.auth-card h2 {
+  margin-bottom: 10px;
+}
+
+/* Subtitle text */
+.auth-card p {
+  margin-bottom: 30px;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+/* Inputs */
+.auth-card input {
+  width: 100%;
+  max-width: 340px;
+  margin: 10px auto;
+  display: block;
+  padding: 12px;
+  border: 1px solid #666;
+  border-radius: 5px;
+  background: #1e1e1e;
+  color: white;
+}
+
+.auth-card input::placeholder {
+  color: #aaa;
+}
+
+/* Button */
+.auth-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #fff;
+  color: #2a2a2a;
   border: none;
-  border-radius: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.auth-btn:hover {
+  background-color: #ccc;
+}
+
+/* Forgot password text */
+.forgot-password {
+  margin: 10px 0;
+  color: #999;
+  font-size: 0.85rem;
   cursor: pointer;
 }
 
-.submit-btn:hover {
-  background-color: #274fb8;
+/* Bottom navigation links */
+.switch-page {
+  font-size: 0.85rem;
+  color: #ccc;
+  margin-top: 20px;
 }
 
-.bottom-link {
-  font-size: 14px;
-  text-align: center;
+.switch-page span {
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
 }
+
+/* Password requirement messages */
+.password-validation {
+  font-size: 0.85rem;
+  text-align: left;
+  color: red;
+  margin: 0 auto 10px auto;
+  max-width: 340px;
+}
+ 

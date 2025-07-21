@@ -1,0 +1,4 @@
+| Part     | Command to Run                       | Location      | Port             |
+| -------- | ------------------------------------ | ------------- | ---------------- |
+| Backend  | `flask run` or `python -m flask run` | `cd Backend`  | `localhost:5000` |
+| Frontend | `npm start`                          | `cd frontend` | `localhost:3000` |

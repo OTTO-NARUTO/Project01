@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Navbar from '../components/Navbar';
 import '../styles/BillingInvoicesPage.css';
 
@@ -6,25 +7,35 @@ const BillingInvoicesPage = () => {
   const [invoices, setInvoices] = useState([]);
 
   useEffect(() => {
-    const storedPlan = localStorage.getItem("selectedPlan");
-    if (storedPlan) {
-      const plan = JSON.parse(storedPlan);
-      setInvoices([
-        {
-          id: 1,
-          item: plan.name,
-          date: new Date().toISOString().slice(0, 10),
-          amount: plan.price,
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const fetchInvoices = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/plans/${user.id}`);
+        const plans = response.data;
+
+        const formatted = plans.map((plan, index) => ({
+          id: index + 1,
+          item: plan.planName,
+          date: new Date(plan.selectedAt).toISOString().slice(0, 10),
+          amount: `₹${plan.price}`,
           status: 'Pending',
-        },
-      ]);
+        }));
+
+        setInvoices(formatted);
+      } catch (error) {
+        console.error("Failed to fetch plans:", error);
+      }
+    };
+
+    if (user?.id) {
+      fetchInvoices();
     }
   }, []);
 
   const handleDelete = (id) => {
     const updated = invoices.filter((invoice) => invoice.id !== id);
     setInvoices(updated);
-    localStorage.removeItem('selectedPlan');
   };
 
   return (
